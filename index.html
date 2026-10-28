@@ -404,6 +404,8 @@ summary { cursor: pointer; font-family: var(--font-display); font-size: 17px; }
     say($('key').value.trim() ? '설정을 저장했어요. 이제 사진을 찍어 보세요.' : 'API 키를 넣어 주세요.');
     if ($('key').value.trim()) $('settingsBox').open = false;
   });
+  // keep whatever was typed even if 저장 was never pressed
+  $('key').addEventListener('change', () => store.set('bp.key', $('key').value.trim()));
   $('clearKey').addEventListener('click', () => { store.set('bp.key', ''); $('key').value = ''; say('이 휴대폰에서 API 키를 지웠어요.'); });
   const modelName = () => store.get('bp.modelCustom') || store.get('bp.model') || 'gemini-2.5-flash-image';
 
@@ -488,6 +490,7 @@ summary { cursor: pointer; font-family: var(--font-display); font-size: 17px; }
   }
   async function run() {
     if (!photoB64 || working) return;
+    if (!store.get('bp.key') && $('key').value.trim()) store.set('bp.key', $('key').value.trim());
     if (!store.get('bp.key')) { $('settingsBox').open = true; say('먼저 설정에서 Gemini API 키를 저장해 주세요.', true); return; }
     working = true; busy.hidden = false; saveBtn.disabled = true; againBtn.disabled = true;
     const st = style(), t0 = Date.now();
